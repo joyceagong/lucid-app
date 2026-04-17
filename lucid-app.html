@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucid — Brain Health</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+.app { max-width: 420px; width: 100%; background: #f5f5f5; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.logo { font-size: 22px; font-weight: 700; color: #111; letter-spacing: -0.5px; }
+.logo span { color: #1D9E75; }
+.live-badge { font-size: 11px; background: #E1F5EE; color: #0F6E56; padding: 4px 11px; border-radius: 20px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #1D9E75; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.profile-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 14px; padding: 13px 15px; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: #E6F1FB; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #185FA5; flex-shrink: 0; }
+.profile-name { font-size: 15px; font-weight: 600; color: #111; }
+.profile-sub { font-size: 12px; color: #888; margin-top: 2px; }
+.profile-tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
+.tag { font-size: 10px; padding: 2px 9px; border-radius: 20px; font-weight: 600; }
+.tag-apoe { background: #FAEEDA; color: #854F0B; }
+.tag-member { background: #E1F5EE; color: #0F6E56; }
+.tag-days { background: #f0f0f0; color: #555; }
+.tab-bar { display: flex; gap: 4px; background: #e8e8e8; border-radius: 11px; padding: 3px; margin-bottom: 1.25rem; }
+.tab { flex: 1; font-size: 13px; padding: 7px 4px; border-radius: 9px; border: none; background: transparent; color: #666; cursor: pointer; font-family: inherit; font-weight: 500; transition: all 0.15s; }
+.tab.active { background: #fff; color: #111; border: 0.5px solid rgba(0,0,0,0.1); font-weight: 600; }
+.score-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; }
+.score-label { font-size: 12px; color: #888; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.score-row { display: flex; align-items: baseline; gap: 10px; }
+.score-num { font-size: 56px; font-weight: 700; color: #1D9E75; line-height: 1; }
+.score-meta { flex: 1; }
+.score-sub { font-size: 13px; color: #888; }
+.trend-chip { font-size: 11px; background: #E1F5EE; color: #0F6E56; padding: 4px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+.chart-area { height: 80px; margin-top: 1rem; }
+.chart-area svg { width: 100%; height: 100%; }
+.section-title { font-size: 11px; color: #aaa; margin: 1.25rem 0 0.6rem; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+.stream-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+.stream-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 12px; }
+.stream-icon { width: 30px; height: 30px; border-radius: 8px; margin-bottom: 9px; display: flex; align-items: center; justify-content: center; }
+.stream-icon.tear { background: #E1F5EE; }
+.stream-icon.retina { background: #E6F1FB; }
+.stream-name { font-size: 11px; color: #aaa; font-weight: 500; }
+.stream-val { font-size: 16px; font-weight: 700; color: #111; margin: 3px 0; }
+.stream-status { font-size: 11px; font-weight: 600; }
+.ok { color: #0F6E56; }
+.watch { color: #854F0B; }
+.bm-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+.bm-row { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 10px; padding: 11px 13px; }
+.bm-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.bm-name { font-size: 13px; color: #111; font-weight: 600; }
+.bm-val { font-size: 12px; color: #888; }
+.bm-bar-bg { height: 4px; background: #f0f0f0; border-radius: 2px; }
+.bm-bar-fill { height: 4px; border-radius: 2px; transition: width 0.6s ease; }
+.alert-box { background: #FAEEDA; border: 0.5px solid #EF9F27; border-radius: 13px; padding: 13px 15px; margin-bottom: 1rem; }
+.alert-text { font-size: 13px; color: #633806; line-height: 1.55; }
+.alert-text strong { font-weight: 700; }
+.share-btn { margin-top: 11px; width: 100%; padding: 9px; border-radius: 9px; border: 1.5px solid #EF9F27; background: transparent; color: #854F0B; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.15s; }
+.share-btn:hover { background: rgba(239,159,39,0.12); }
+.share-confirm { display: none; background: #E1F5EE; border: 0.5px solid #1D9E75; border-radius: 8px; padding: 9px 13px; font-size: 12px; color: #0F6E56; font-weight: 600; text-align: center; margin-top: 9px; }
+.oct-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 13px; overflow: hidden; margin-bottom: 1rem; }
+.oct-header { padding: 13px 15px; border-bottom: 0.5px solid rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+.oct-title { font-size: 14px; font-weight: 700; color: #111; }
+.oct-date { font-size: 11px; color: #aaa; margin-top: 2px; }
+.eye-toggle { display: flex; gap: 3px; background: #f0f0f0; border-radius: 8px; padding: 2px; }
+.eye-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; border: none; background: transparent; color: #888; cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.15s; }
+.eye-btn.active { background: #fff; color: #111; border: 0.5px solid rgba(0,0,0,0.1); }
+.oct-scan { padding: 14px; }
+.oct-layers { height: 104px; border-radius: 9px; overflow: hidden; background: #042C53; }
+.oct-legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+.oct-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #888; }
+.oct-leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+.oct-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; padding: 0 14px 14px; }
+.oct-met { background: #f7f7f7; border-radius: 9px; padding: 9px 11px; }
+.oct-met-label { font-size: 10px; color: #aaa; font-weight: 500; }
+.oct-met-val { font-size: 16px; font-weight: 700; color: #111; margin-top: 3px; }
+.oct-met-unit { font-size: 10px; color: #aaa; }
+.oct-note { font-size: 12px; color: #888; line-height: 1.6; background: #f7f7f7; border-radius: 9px; padding: 10px 13px; margin: 0 14px 14px; }
+.hist-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 14px; padding: 1.25rem; }
+.history-row { display: flex; align-items: center; padding: 9px 0; border-bottom: 0.5px solid rgba(0,0,0,0.06); gap: 10px; }
+.history-row:last-child { border-bottom: none; }
+.hist-date { font-size: 12px; color: #aaa; width: 54px; flex-shrink: 0; }
+.hist-bar-bg { flex: 1; height: 5px; border-radius: 3px; background: #f0f0f0; }
+.hist-fill { height: 5px; border-radius: 3px; }
+.hist-num { font-size: 13px; font-weight: 700; width: 26px; text-align: right; }
+.hist-note { font-size: 12px; color: #888; background: #f7f7f7; border-radius: 9px; padding: 10px 13px; margin-top: 13px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo"><span>Lucid</span></div>
+    <div class="live-badge"><div class="live-dot"></div>Live</div>
+  </div>
+
+  <div class="profile-card">
+    <div class="avatar">MH</div>
+    <div>
+      <div class="profile-name">Margaret H., 58</div>
+      <div class="profile-sub">Providence, RI</div>
+      <div class="profile-tags">
+        <span class="tag tag-apoe">APOE4 carrier</span>
+        <span class="tag tag-member">Member</span>
+        <span class="tag tag-days">Day 94</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('overview')">Overview</button>
+    <button class="tab" onclick="showTab('oct')">OCT scan</button>
+    <button class="tab" onclick="showTab('history')">History</button>
+  </div>
+
+  <div id="tab-overview">
+    <div class="score-card">
+      <div class="score-label">Brain health score</div>
+      <div class="score-row">
+        <div class="score-num" id="animated-score">0</div>
+        <div class="score-meta">
+          <div class="score-sub">/ 100</div>
+          <div class="score-sub" style="margin-top:2px;">Stable baseline</div>
+        </div>
+        <div class="trend-chip">+2 this week</div>
+      </div>
+      <div class="chart-area">
+        <svg viewBox="0 0 340 72" preserveAspectRatio="none">
+          <path d="M0,52 C20,50 40,46 60,44 C80,42 100,45 120,43 C140,41 160,38 180,36 C200,34 220,32 240,28 C260,24 280,22 300,18 C320,14 330,13 340,12 L340,72 L0,72 Z" fill="#1D9E75" fill-opacity="0.08"/>
+          <path d="M0,52 C20,50 40,46 60,44 C80,42 100,45 120,43 C140,41 160,38 180,36 C200,34 220,32 240,28 C260,24 280,22 300,18 C320,14 330,13 340,12" stroke="#1D9E75" stroke-width="2" fill="none"/>
+          <text x="0" y="70" font-size="9" fill="#ccc">90d ago</text>
+          <text x="152" y="70" font-size="9" fill="#ccc">45d ago</text>
+          <text x="312" y="70" font-size="9" fill="#ccc">today</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="alert-box">
+      <div class="alert-text">
+        <strong>Mild GFAP elevation detected</strong> — 12% above your baseline over the past 8 days. No clinical action needed yet.
+      </div>
+      <button class="share-btn" onclick="shareWithDoctor()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v9M3.5 6.5L7 10l3.5-3.5" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 11.5v1a.5.5 0 00.5.5h11a.5.5 0 00.5-.5v-1" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Share with your doctor
+      </button>
+      <div class="share-confirm" id="share-confirm">Report sent to Dr. Patel — 1 Park Row, Providence</div>
+    </div>
+
+    <div class="section-title">Data streams</div>
+    <div class="stream-grid">
+      <div class="stream-card">
+        <div class="stream-icon tear">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1C7 1 2.5 6 2.5 9a4.5 4.5 0 009 0C11.5 6 7 1 7 1z" fill="#1D9E75" fill-opacity="0.8"/></svg>
+        </div>
+        <div class="stream-name">Tear biomarkers</div>
+        <div class="stream-val">Continuous</div>
+        <div class="stream-status watch">GFAP +12%</div>
+      </div>
+      <div class="stream-card">
+        <div class="stream-icon retina">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#185FA5" stroke-width="1.5"/><circle cx="7" cy="7" r="2" fill="#185FA5" fill-opacity="0.5"/></svg>
+        </div>
+        <div class="stream-name">Retinal OCT</div>
+        <div class="stream-val">Last night</div>
+        <div class="stream-status ok">Within baseline</div>
+      </div>
+    </div>
+
+    <div class="section-title">Biomarker detail</div>
+    <div class="bm-list">
+      <div class="bm-row">
+        <div class="bm-top">
+          <span class="bm-name">GFAP</span>
+          <span class="bm-val" style="color:#854F0B;">0.18 ng/mL · elevated</span>
+        </div>
+        <div class="bm-bar-bg"><div class="bm-bar-fill" style="width:72%;background:#EF9F27;"></div></div>
+      </div>
+      <div class="bm-row">
+        <div class="bm-top">
+          <span class="bm-name">NfL</span>
+          <span class="bm-val" style="color:#0F6E56;">12.4 pg/mL · normal</span>
+        </div>
+        <div class="bm-bar-bg"><div class="bm-bar-fill" style="width:38%;background:#1D9E75;"></div></div>
+      </div>
+      <div class="bm-row">
+        <div class="bm-top">
+          <span class="bm-name">IL-1β</span>
+          <span class="bm-val" style="color:#0F6E56;">2.1 pg/mL · normal</span>
+        </div>
+        <div class="bm-bar-bg"><div class="bm-bar-fill" style="width:28%;background:#1D9E75;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-oct" style="display:none;">
+    <div class="oct-card">
+      <div class="oct-header">
+        <div>
+          <div class="oct-title">Retinal OCT</div>
+          <div class="oct-date">Apr 16, 2026 · 11:42 PM</div>
+        </div>
+        <div class="eye-toggle">
+          <button class="eye-btn active" id="btn-right" onclick="switchEye('right')">Right</button>
+          <button class="eye-btn" id="btn-left" onclick="switchEye('left')">Left</button>
+        </div>
+      </div>
+      <div class="oct-scan">
+        <div class="oct-layers">
+          <svg width="100%" height="104" viewBox="0 0 340 104" preserveAspectRatio="none">
+            <rect x="0" y="0" width="340" height="104" fill="#042C53"/>
+            <path d="M0,14 Q85,12 170,14 Q255,16 340,14" stroke="#B5D4F4" stroke-width="1.5" fill="none" opacity="0.9"/>
+            <path d="M0,22 Q85,21 170,23 Q255,25 340,22" stroke="#85B7EB" stroke-width="1" fill="none" opacity="0.6"/>
+            <path d="M0,34 Q40,31 80,34 Q120,36 160,33 Q200,31 240,35 Q290,37 340,34" stroke="#378ADD" stroke-width="9" fill="none" opacity="0.28"/>
+            <path d="M0,34 Q40,31 80,34 Q120,36 160,33 Q200,31 240,35 Q290,37 340,34" stroke="#378ADD" stroke-width="1.5" fill="none" opacity="0.9"/>
+            <path d="M0,53 Q60,50 130,53 Q200,57 270,52 Q305,50 340,53" stroke="#185FA5" stroke-width="1.5" fill="none" opacity="0.7"/>
+            <path d="M0,66 Q85,63 170,67 Q255,70 340,66" stroke="#0C447C" stroke-width="6" fill="none" opacity="0.38"/>
+            <path d="M0,66 Q85,63 170,67 Q255,70 340,66" stroke="#B5D4F4" stroke-width="1" fill="none" opacity="0.5"/>
+            <path d="M0,82 Q85,79 170,82 Q255,85 340,82" stroke="#85B7EB" stroke-width="1" fill="none" opacity="0.35"/>
+            <text x="7" y="11" font-size="7.5" fill="#85B7EB" opacity="0.85">RNFL</text>
+            <text x="7" y="32" font-size="7.5" fill="#85B7EB" opacity="0.85">GCL</text>
+            <text x="7" y="51" font-size="7.5" fill="#85B7EB" opacity="0.85">IPL</text>
+            <text x="7" y="65" font-size="7.5" fill="#85B7EB" opacity="0.85">RPE</text>
+          </svg>
+        </div>
+        <div class="oct-legend">
+          <div class="oct-leg-item"><div class="oct-leg-dot" style="background:#B5D4F4;"></div>RNFL</div>
+          <div class="oct-leg-item"><div class="oct-leg-dot" style="background:#378ADD;"></div>GCL</div>
+          <div class="oct-leg-item"><div class="oct-leg-dot" style="background:#185FA5;"></div>IPL</div>
+          <div class="oct-leg-item"><div class="oct-leg-dot" style="background:#0C447C;"></div>RPE</div>
+        </div>
+      </div>
+      <div class="oct-metrics" id="oct-metrics">
+        <div class="oct-met">
+          <div class="oct-met-label">RNFL thickness</div>
+          <div class="oct-met-val">91 <span class="oct-met-unit">µm</span></div>
+          <div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div>
+        </div>
+        <div class="oct-met">
+          <div class="oct-met-label">Vessel density</div>
+          <div class="oct-met-val">44 <span class="oct-met-unit">%</span></div>
+          <div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div>
+        </div>
+        <div class="oct-met">
+          <div class="oct-met-label">FAZ area</div>
+          <div class="oct-met-val">0.28 <span class="oct-met-unit">mm²</span></div>
+          <div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div>
+        </div>
+      </div>
+      <div class="oct-note" id="oct-note">AI interpretation: right eye retinal layer structure within personalized baseline. No RNFL thinning or vessel dropout detected.</div>
+    </div>
+  </div>
+
+  <div id="tab-history" style="display:none;">
+    <div class="hist-card">
+      <div class="score-label" style="margin-bottom:14px;">90-day brain health score</div>
+      <div class="history-row"><span class="hist-date">Apr 16</span><div class="hist-bar-bg"><div class="hist-fill" style="width:82%;background:#1D9E75;"></div></div><span class="hist-num" style="color:#0F6E56;">82</span></div>
+      <div class="history-row"><span class="hist-date">Apr 9</span><div class="hist-bar-bg"><div class="hist-fill" style="width:80%;background:#1D9E75;"></div></div><span class="hist-num" style="color:#0F6E56;">80</span></div>
+      <div class="history-row"><span class="hist-date">Apr 2</span><div class="hist-bar-bg"><div class="hist-fill" style="width:79%;background:#1D9E75;"></div></div><span class="hist-num" style="color:#0F6E56;">79</span></div>
+      <div class="history-row"><span class="hist-date">Mar 26</span><div class="hist-bar-bg"><div class="hist-fill" style="width:77%;background:#1D9E75;"></div></div><span class="hist-num" style="color:#0F6E56;">77</span></div>
+      <div class="history-row"><span class="hist-date">Mar 19</span><div class="hist-bar-bg"><div class="hist-fill" style="width:75%;background:#5DCAA5;"></div></div><span class="hist-num" style="color:#0F6E56;">75</span></div>
+      <div class="history-row"><span class="hist-date">Mar 12</span><div class="hist-bar-bg"><div class="hist-fill" style="width:73%;background:#5DCAA5;"></div></div><span class="hist-num" style="color:#0F6E56;">73</span></div>
+      <div class="history-row"><span class="hist-date">Mar 5</span><div class="hist-bar-bg"><div class="hist-fill" style="width:74%;background:#5DCAA5;"></div></div><span class="hist-num" style="color:#0F6E56;">74</span></div>
+      <div class="history-row"><span class="hist-date">Feb 26</span><div class="hist-bar-bg"><div class="hist-fill" style="width:70%;background:#5DCAA5;"></div></div><span class="hist-num" style="color:#0F6E56;">70</span></div>
+      <div class="hist-note">Baseline established in first 30 days. Scores reflect nightly OCT + continuous tear biomarker analysis. Consistent upward trend since onboarding.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(name) {
+  ['overview','oct','history'].forEach(function(t) {
+    document.getElementById('tab-'+t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach(function(btn, i) {
+    btn.classList.toggle('active', ['overview','oct','history'][i] === name);
+  });
+}
+
+function switchEye(eye) {
+  document.getElementById('btn-right').classList.toggle('active', eye === 'right');
+  document.getElementById('btn-left').classList.toggle('active', eye === 'left');
+  var metrics = document.getElementById('oct-metrics');
+  var note = document.getElementById('oct-note');
+  if (eye === 'right') {
+    metrics.innerHTML = '<div class="oct-met"><div class="oct-met-label">RNFL thickness</div><div class="oct-met-val">91 <span class="oct-met-unit">µm</span></div><div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div></div><div class="oct-met"><div class="oct-met-label">Vessel density</div><div class="oct-met-val">44 <span class="oct-met-unit">%</span></div><div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div></div><div class="oct-met"><div class="oct-met-label">FAZ area</div><div class="oct-met-val">0.28 <span class="oct-met-unit">mm²</span></div><div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div></div>';
+    note.textContent = 'AI interpretation: right eye retinal layer structure within personalized baseline. No RNFL thinning or vessel dropout detected.';
+  } else {
+    metrics.innerHTML = '<div class="oct-met"><div class="oct-met-label">RNFL thickness</div><div class="oct-met-val">88 <span class="oct-met-unit">µm</span></div><div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div></div><div class="oct-met"><div class="oct-met-label">Vessel density</div><div class="oct-met-val">43 <span class="oct-met-unit">%</span></div><div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div></div><div class="oct-met"><div class="oct-met-label">FAZ area</div><div class="oct-met-val">0.31 <span class="oct-met-unit">mm²</span></div><div style="font-size:10px;color:#0F6E56;margin-top:3px;font-weight:600;">Normal</div></div>';
+    note.textContent = 'AI interpretation: left eye within baseline. Marginally wider FAZ — within normal variation. Monitoring longitudinally.';
+  }
+}
+
+function shareWithDoctor() {
+  var confirm = document.getElementById('share-confirm');
+  confirm.style.display = 'block';
+  setTimeout(function() { confirm.style.display = 'none'; }, 3000);
+}
+
+var score = 0;
+var el = document.getElementById('animated-score');
+var iv = setInterval(function() {
+  score = Math.min(score + 2, 82);
+  el.textContent = score;
+  if (score >= 82) clearInterval(iv);
+}, 20);
+</script>
+</body>
+</html>
